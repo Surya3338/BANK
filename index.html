@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Bank System</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+        
+        /* Header */
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            width: 100%;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        header h1 {
+            margin: 0;
+        }
+        
+        /* Navigation Bar */
+        nav {
+            display: flex;
+            justify-content: space-around;
+            background-color: #333;
+            width: 100%;
+            padding: 10px;
+            border-radius: 0 0 10px 10px;
+        }
+        
+        nav button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        
+        nav button:hover {
+            background-color: #45a049;
+        }
+        
+        /* Main Content */
+        main {
+            background-color: white;
+            width: 100%;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            margin-top: 20px;
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        /* Input and Button Styles */
+        input[type="number"] {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        
+        button.action-btn {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        
+        button.action-btn:hover {
+            background-color: #45a049;
+        }
+        
+        /* Transaction History */
+        #transactionList {
+            list-style: none;
+            padding: 0;
+        }
+        
+        #transactionList li {
+            background-color: #f9f9f9;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        /* Mobile Friendly */
+        @media (max-width: 600px) {
+            nav {
+                flex-direction: column;
+                align-items: center;
+            }
+        
+            nav button {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ICC Bank</h1>
+        </header>
+        <nav>
+            <button id="dashboardBtn">Dashboard</button>
+            <button id="depositBtn">Deposit</button>
+            <button id="withdrawBtn">Withdraw</button>
+            <button id="historyBtn">Transaction History</button>
+        </nav>
+        <main id="content">
+            <!-- Default Dashboard Section -->
+            <div id="dashboard" class="section active">
+                <h2>Welcome to Your Dashboard</h2>
+                <p>Your current balance: <span id="balance">₹0.00</span></p>
+            </div>
+            <!-- Deposit Section -->
+            <div id="deposit" class="section">
+                <h2>Deposit Money</h2>
+                <input type="number" id="depositAmount" placeholder="Enter amount">
+                <button class="action-btn" onclick="deposit()">Deposit</button>
+            </div>
+            <!-- Withdraw Section -->
+            <div id="withdraw" class="section">
+                <h2>Withdraw Money</h2>
+                <input type="number" id="withdrawAmount" placeholder="Enter amount">
+                <button class="action-btn" onclick="withdraw()">Withdraw</button>
+            </div>
+            <!-- Transaction History Section -->
+            <div id="history" class="section">
+                <h2>Transaction History</h2>
+                <ul id="transactionList"></ul>
+            </div>
+        </main>
+    </div>
+    <script>
+        let balance = 0;
+        const transactions = [];
+        
+        const updateBalance = () => {
+            document.getElementById('balance').textContent = `₹${balance.toFixed(2)}`;
+        };
+        
+        const deposit = () => {
+            const amountInput = document.getElementById('depositAmount');
+            const amount = parseFloat(amountInput.value);
+            if (amount > 0) {
+                balance += amount;
+                transactions.push(`Deposited: ₹${amount.toFixed(2)}`);
+                updateBalance();
+                alert('Deposit successful!');
+            } else {
+                alert('Please enter a valid amount.');
+            }
+            amountInput.value = '';
+        };
+        
+        const withdraw = () => {
+            const amountInput = document.getElementById('withdrawAmount');
+            const amount = parseFloat(amountInput.value);
+            if (amount > 0 && amount <= balance) {
+                balance -= amount;
+                transactions.push(`Withdrew: ₹${amount.toFixed(2)}`);
+                updateBalance();
+                alert('Withdrawal successful!');
+            } else if (amount > balance) {
+                alert('Insufficient balance.');
+            } else {
+                alert('Please enter a valid amount.');
+            }
+            amountInput.value = '';
+        };
+        
+        const showHistory = () => {
+            const transactionList = document.getElementById('transactionList');
+            if (transactions.length === 0) {
+                transactionList.innerHTML = '<li>No transactions yet.</li>';
+                return;
+            }
+            transactionList.innerHTML = transactions.map(tx => `<li>${tx}</li>`).join('');
+        };
+        
+        const switchSection = (sectionId) => {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+        };
+        
+        // Event Listeners for Navigation Buttons
+        document.getElementById('dashboardBtn').addEventListener('click', () => switchSection('dashboard'));
+        document.getElementById('depositBtn').addEventListener('click', () => switchSection('deposit'));
+        document.getElementById('withdrawBtn').addEventListener('click', () => switchSection('withdraw'));
+        document.getElementById('historyBtn').addEventListener('click', () => {
+            showHistory();
+            switchSection('history');
+        });
+        
+        // Initialize Balance Display
+        updateBalance();
+    </script>
+</body>
+</html>
